@@ -1,0 +1,385 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Movie Ticket Booking</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #101522;
+    color: white;
+}
+
+header {
+    background: #1b2233;
+    padding: 18px;
+    text-align: center;
+    color: #ff4b72;
+    font-size: 25px;
+    font-weight: bold;
+}
+
+.container {
+    max-width: 600px;
+    margin: 25px auto;
+    padding: 20px;
+    background: #1b2233;
+    border-radius: 12px;
+    text-align: center;
+}
+
+.movie-img {
+    font-size: 65px;
+    margin: 10px;
+}
+
+h2 {
+    color: #ff4b72;
+}
+
+.screen {
+    margin: 35px auto;
+    padding: 10px;
+    width: 80%;
+    background: #c9d6e5;
+    color: #111827;
+    border-radius: 50% 50% 5px 5px;
+    box-shadow: 0 5px 20px #8fbfff;
+    font-weight: bold;
+}
+
+.seat-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 7px;
+    margin: 10px 0;
+}
+
+.row-label {
+    width: 20px;
+    color: #ffcf66;
+    font-weight: bold;
+}
+
+.seat {
+    width: 35px;
+    height: 32px;
+    border: 1px solid #42d392;
+    background: transparent;
+    color: #42d392;
+    border-radius: 7px 7px 3px 3px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.seat.selected {
+    background: #42d392;
+    color: #101522;
+}
+
+.seat.booked {
+    background: #697386;
+    border-color: #697386;
+    color: white;
+    cursor: not-allowed;
+}
+
+.legend {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin: 20px 0;
+    font-size: 13px;
+}
+
+.legend span {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.dot {
+    width: 14px;
+    height: 14px;
+    display: inline-block;
+    border-radius: 4px;
+}
+
+.available { background: transparent; border: 2px solid #42d392; }
+.chosen { background: #42d392; }
+.unavailable { background: #697386; }
+
+button.action {
+    background: #ff4b72;
+    color: white;
+    border: none;
+    padding: 13px 25px;
+    border-radius: 7px;
+    cursor: pointer;
+    font-size: 16px;
+    margin: 12px;
+}
+
+button.action:hover {
+    background: #e52e59;
+}
+
+select, input {
+    width: 90%;
+    padding: 12px;
+    margin: 10px;
+    border-radius: 6px;
+    border: none;
+}
+
+#payment, #success {
+    display: none;
+}
+
+.details {
+    background: #283247;
+    padding: 15px;
+    border-radius: 8px;
+    margin: 15px 0;
+    line-height: 1.8;
+}
+
+.note {
+    color: #c2c9d6;
+    font-size: 13px;
+}
+
+@media (max-width: 400px) {
+    .seat {
+        width: 29px;
+        height: 30px;
+        font-size: 10px;
+    }
+    .seat-row {
+        gap: 5px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>🎬 MyShow</header>
+
+<!-- SEAT BOOKING PAGE -->
+<div class="container" id="booking">
+
+    <div class="movie-img">🎬</div>
+    <h2>Avengers: Endgame</h2>
+    <p>English | Action | 2h 30m</p>
+    <p>📍 PVR Cinemas | 6:30 PM</p>
+
+    <h3>Select Your Seats</h3>
+
+    <div class="screen">SCREEN THIS WAY</div>
+
+    <div id="seatLayout"></div>
+
+    <div class="legend">
+        <span><i class="dot available"></i> Available</span>
+        <span><i class="dot chosen"></i> Selected</span>
+        <span><i class="dot unavailable"></i> Booked</span>
+    </div>
+
+    <div class="details">
+        <p>Selected Seats: <b id="selectedSeats">None</b></p>
+        <p>Ticket Price: ₹150 / seat</p>
+        <h3>Total: ₹<span id="total">0</span></h3>
+    </div>
+
+    <button class="action" onclick="continuePayment()">
+        Proceed to Payment
+    </button>
+</div>
+
+<!-- PAYMENT PAGE -->
+<div class="container" id="payment">
+
+    <h2>💳 Payment Page</h2>
+    <p>Confirm your booking details</p>
+
+    <div class="details">
+        <p>Movie: Avengers: Endgame</p>
+        <p>Seats: <b id="paymentSeats"></b></p>
+        <p>Show Time: 6:30 PM</p>
+        <h2>Total: ₹<span id="paymentTotal"></span></h2>
+    </div>
+
+    <h3>Select Payment Method</h3>
+
+    <select id="method">
+        <option value="UPI">UPI (Demo)</option>
+        <option value="Net Banking">Net Banking (Demo)</option>
+        <option value="Cash">Cash (Demo)</option>
+    </select>
+
+    <p class="note">
+        Demo payment only. No real payment will be made.
+    </p>
+
+    <button class="action" onclick="payNow()">
+        Pay Now
+    </button>
+
+    <button class="action" onclick="goBack()">
+        Back
+    </button>
+</div>
+
+<!-- SUCCESS PAGE -->
+<div class="container" id="success">
+
+    <h1>✅</h1>
+    <h2>Booking Successful!</h2>
+
+    <p>Your ticket booking is confirmed in this demo.</p>
+
+    <div class="details">
+        <p>Movie: Avengers: Endgame</p>
+        <p>Seats: <b id="finalSeats"></b></p>
+        <p>Payment: <b id="finalMethod"></b></p>
+        <h3>Amount Paid: ₹<span id="finalTotal"></span></h3>
+    </div>
+
+    <button class="action" onclick="closePage()">
+        Done
+    </button>
+
+    <p id="closeMessage" class="note"></p>
+</div>
+
+<script>
+const price = 150;
+let selected = [];
+
+// Seats already booked in this demo
+const booked = ["A3", "B5", "C2", "D7", "E4"];
+
+const rows = ["A", "B", "C", "D", "E", "F"];
+const seatLayout = document.getElementById("seatLayout");
+
+// Create seats
+rows.forEach(row => {
+    const rowDiv = document.createElement("div");
+    rowDiv.className = "seat-row";
+
+    const label = document.createElement("span");
+    label.className = "row-label";
+    label.textContent = row;
+    rowDiv.appendChild(label);
+
+    for (let i = 1; i <= 8; i++) {
+        const seatName = row + i;
+        const seat = document.createElement("button");
+        seat.className = "seat";
+        seat.textContent = i;
+
+        if (booked.includes(seatName)) {
+            seat.classList.add("booked");
+            seat.disabled = true;
+        } else {
+            seat.addEventListener("click", function() {
+                selectSeat(seatName, seat);
+            });
+        }
+
+        rowDiv.appendChild(seat);
+    }
+
+    seatLayout.appendChild(rowDiv);
+});
+
+// Select or deselect seats
+function selectSeat(name, seat) {
+
+    if (selected.includes(name)) {
+        selected = selected.filter(s => s !== name);
+        seat.classList.remove("selected");
+    } else {
+        if (selected.length >= 6) {
+            alert("You can select up to 6 seats.");
+            return;
+        }
+
+        selected.push(name);
+        seat.classList.add("selected");
+    }
+
+    document.getElementById("selectedSeats").textContent =
+        selected.length ? selected.join(", ") : "None";
+
+    document.getElementById("total").textContent =
+        selected.length * price;
+}
+
+// Go to payment page
+function continuePayment() {
+
+    if (selected.length === 0) {
+        alert("Please select your seats first!");
+        return;
+    }
+
+    document.getElementById("booking").style.display = "none";
+    document.getElementById("payment").style.display = "block";
+
+    document.getElementById("paymentSeats").textContent =
+        selected.join(", ");
+
+    document.getElementById("paymentTotal").textContent =
+        selected.length * price;
+}
+
+// Return to seat selection
+function goBack() {
+    document.getElementById("payment").style.display = "none";
+    document.getElementById("booking").style.display = "block";
+}
+
+// Demo payment confirmation
+function payNow() {
+
+    const method = document.getElementById("method").value;
+
+    document.getElementById("payment").style.display = "none";
+    document.getElementById("success").style.display = "block";
+
+    document.getElementById("finalSeats").textContent =
+        selected.join(", ");
+
+    document.getElementById("finalTotal").textContent =
+        selected.length * price;
+
+    document.getElementById("finalMethod").textContent = method;
+
+    // Mark seats booked for this page session
+    selected.forEach(name => {
+        booked.push(name);
+    });
+}
+
+// Close page
+function closePage() {
+    window.close();
+    document.getElementById("closeMessage").textContent =
+        "If the tab did not close, you can close it manually.";
+}
+</script>
+
+</body>
+</html>
